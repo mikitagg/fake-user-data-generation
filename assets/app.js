@@ -7,4 +7,16 @@ import './bootstrap.js';
  */
 import './styles/app.css';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+$(document).ready(function() {
+    $('#selectRegion').change(function() {
+        var selectedOption = $(this).val();
+        $.ajax({
+            url: '/index',
+            type: 'POST',
+            data: { option : selectedOption },
+            success: function(response) {
+            }
+        });
+    });
+});
+
