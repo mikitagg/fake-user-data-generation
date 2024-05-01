@@ -24,21 +24,23 @@ class DataGenerator
         $this->faker = Factory::create();
     }
 
-    public function generateData(?string $region = 'RU'): array
+    public function generateData(?string $region): array
     {
         $userData = [];
-
+        $this->faker->seed(0);
         $this->setRegion($region);
 
-        for ($i = 0; $i < 10; ++$i) {
-            $userData[] = [
+        for ($i = 0; $i < 100; ++$i) {
+            $userData[] = $this->introduceErrors([
                 'id' => $i,
                 'uuid' =>  $this->faker->unique()->uuid(),
                 'name' => $this->faker->name(),
                 'address' => $this->faker->address(),
                 'phoneNumber' =>  $this->faker->phoneNumber(),
-            ];
+            ]);
         }
+
+
         return $userData;
     }
 
@@ -61,6 +63,76 @@ class DataGenerator
                 $this->faker->addProvider(new enPhoneNumber($this->faker));
                 break;
         }
+    }
+
+    public function createErrors(string $str, int $countErrors): string
+    {
+        for ($i = 0; $i < $countErrors; ++$i) {
+            $typeError = rand(1, 3);
+            switch ($typeError) {
+                case 1:
+                    $str = $this->removeRandomChar($str);
+                    break;
+                case 2:
+                    $str = $this->addRandomChar($str);
+                    break;
+                case 3:
+                    $str = $this->swapRandomAdjacentChars($str);
+                    break;
+            }
+        }
+        return $str;
+    }
+
+    public function introduceErrors(array $array): array
+    {
+        $uuid= $array['uuid'];
+        $array['uuid'] = '';
+        $string = implode(';', $array);
+        $errorString = $this->createErrors($string, 20);
+        $newArray = explode(';', $errorString);
+        $newArray = array_combine(array_keys($array), $newArray);
+        $newArray['uuid'] = $uuid;
+
+        return $newArray;
+    }
+
+    function removeRandomChar(string $str): string
+    {
+        $strArray = str_split($str);
+        $alphabetChars = array_filter($strArray, function($char) {
+            return preg_match('/\pL/u', $char);
+        });
+        if (empty($alphabetChars)) {
+            return $str;
+        }
+        $pos = array_rand($alphabetChars);
+        return substr_replace($str, '', $pos, 1);
+    }
+
+    function addRandomChar(string $str): string
+    {
+        $strArray = preg_split('//u', $str, null, PREG_SPLIT_NO_EMPTY);
+        $alphabetChars = array_filter($strArray, function($char) {
+            return preg_match('/\pL/u', $char);
+        });
+        if (empty($alphabetChars)) {
+            return $str;
+        }
+        $pos = rand(0, mb_strlen($str));
+        $char = $alphabetChars[array_rand($alphabetChars)];
+        return mb_substr($str, 0, $pos) . $char . mb_substr($str, $pos);
+    }
+
+    function swapRandomAdjacentChars(string $str): string
+    {
+        $strArray = preg_split('//u', $str, null, PREG_SPLIT_NO_EMPTY);
+        if (count($strArray) < 2) {
+            return $str;
+        }
+        $pos = rand(0, count($strArray) - 2);
+        list($strArray[$pos], $strArray[$pos+1]) = array($strArray[$pos+1], $strArray[$pos]);
+        return implode('', $strArray);
     }
 
 }
