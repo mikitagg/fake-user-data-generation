@@ -42,7 +42,7 @@ $(document).ready(function() {
     });
 
     button.addEventListener("click", () => {
-        seedInput.value = Math.random().toString(36).substring(7);
+        seedInput.value = Math.floor(Math.random() * 10000000);
 
     })
 

@@ -115,7 +115,7 @@ class DataGenerator
 
     function addRandomChar(string $str): string
     {
-        $strArray = preg_split('//u', $str, null, PREG_SPLIT_NO_EMPTY);
+        $strArray = preg_split('//u', $str, -1, PREG_SPLIT_NO_EMPTY);
         $alphabetChars = array_filter($strArray, function($char) {
             return preg_match('/\pL/u', $char);
         });
@@ -129,7 +129,7 @@ class DataGenerator
 
     function swapRandomAdjacentChars(string $str): string
     {
-        $strArray = preg_split('//u', $str, null, PREG_SPLIT_NO_EMPTY);
+        $strArray = preg_split('//u', $str, -1, PREG_SPLIT_NO_EMPTY);
         if (count($strArray) < 2) {
             return $str;
         }
