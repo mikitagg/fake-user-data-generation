@@ -25,8 +25,11 @@ class IndexController extends AbstractController
     #[Route('/index/getdata', name: 'app_index_getdata')]
     public function getGeneratedData(Request $request, DataGenerator $dataGenerator): JsonResponse
     {
-        $region = $request->get('option');
-        $generatedData = $dataGenerator->generateData($region);
+        $region = $request->get('region');
+        $seed = $request->get('seed');
+        $errors = $request->get('errors');
+
+        $generatedData = $dataGenerator->generateData($region, $errors, $seed);
         return new JsonResponse($generatedData);
     }
 }

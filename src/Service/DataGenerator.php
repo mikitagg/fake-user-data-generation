@@ -24,10 +24,10 @@ class DataGenerator
         $this->faker = Factory::create();
     }
 
-    public function generateData(?string $region): array
+    public function generateData(?string $region, ?int $errors, int|string|null $seed ): array
     {
+        $this->faker->seed($seed);
         $userData = [];
-        $this->faker->seed(0);
         $this->setRegion($region);
 
         for ($i = 0; $i < 100; ++$i) {
@@ -37,7 +37,7 @@ class DataGenerator
                 'name' => $this->faker->name(),
                 'address' => $this->faker->address(),
                 'phoneNumber' =>  $this->faker->phoneNumber(),
-            ]);
+            ], $errors);
         }
 
 
@@ -65,8 +65,11 @@ class DataGenerator
         }
     }
 
-    public function createErrors(string $str, int $countErrors): string
+    public function createErrors(string $str, ?int $countErrors): string
     {
+        if (!$countErrors) {
+            return $str;
+        }
         for ($i = 0; $i < $countErrors; ++$i) {
             $typeError = rand(1, 3);
             switch ($typeError) {
@@ -84,12 +87,12 @@ class DataGenerator
         return $str;
     }
 
-    public function introduceErrors(array $array): array
+    public function introduceErrors(array $array, ?int $errors): array
     {
         $uuid= $array['uuid'];
         $array['uuid'] = '';
         $string = implode(';', $array);
-        $errorString = $this->createErrors($string, 20);
+        $errorString = $this->createErrors($string, $errors);
         $newArray = explode(';', $errorString);
         $newArray = array_combine(array_keys($array), $newArray);
         $newArray['uuid'] = $uuid;
