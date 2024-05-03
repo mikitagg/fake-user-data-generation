@@ -14,9 +14,9 @@ use Faker\Provider\en_US\PhoneNumber as enPhoneNumber;
 use Faker\Factory;
 
 
+
 class DataGenerator
 {
-
     protected \Faker\Generator $faker;
 
     public function __construct()
@@ -24,22 +24,23 @@ class DataGenerator
         $this->faker = Factory::create();
     }
 
-    public function generateData(?string $region, ?int $errors, int|string|null $seed ): array
+    public function generateData(?string $region, int|float $errors, int|string|null $seed): array
     {
+        mt_srand($seed);
         $this->faker->seed($seed);
-        $userData = [];
         $this->setRegion($region);
+        $userData = [];
 
-        for ($i = 0; $i < 100; ++$i) {
+        for ($i = 0; $i < 3; ++$i) {
+
             $userData[] = $this->introduceErrors([
-                'id' => $i,
-                'uuid' =>  $this->faker->unique()->uuid(),
+                //        'id' => $i,
+                //        'uuid' =>  $faker->uuid(),
                 'name' => $this->faker->name(),
                 'address' => $this->faker->address(),
-                'phoneNumber' =>  $this->faker->phoneNumber(),
+                'phoneNumber' => $this->faker->phoneNumber(),
             ], $errors);
         }
-
 
         return $userData;
     }
@@ -65,14 +66,20 @@ class DataGenerator
         }
     }
 
-    public function createErrors(string $str, ?int $countErrors): string
+    public function createErrors(string $str, int|float $countErrors): string
     {
         if (!$countErrors) {
             return $str;
         }
+//        if(is_float($countErrors)) {
+//            $countErrors = $this->possibilityOfError($countErrors);
+//        }
+
+
         for ($i = 0; $i < $countErrors; ++$i) {
-            $typeError = rand(1, 3);
-            switch ($typeError) {
+            $errorType = random_int(1, 3);
+
+            switch ($errorType) {
                 case 1:
                     $str = $this->removeRandomChar($str);
                     break;
@@ -89,53 +96,54 @@ class DataGenerator
 
     public function introduceErrors(array $array, ?int $errors): array
     {
-        $uuid= $array['uuid'];
-        $array['uuid'] = '';
+        //     $uuid= $array['uuid'];
+        //  $array['uuid'] = '';
         $string = implode(';', $array);
         $errorString = $this->createErrors($string, $errors);
         $newArray = explode(';', $errorString);
         $newArray = array_combine(array_keys($array), $newArray);
-        $newArray['uuid'] = $uuid;
+        //     $newArray['uuid'] = $uuid;
 
         return $newArray;
     }
 
-    function removeRandomChar(string $str): string
+    public function removeRandomChar(string $str): string
     {
         $strArray = str_split($str);
-        $alphabetChars = array_filter($strArray, function($char) {
+        $alphabetChars = array_filter($strArray, function ($char) {
             return preg_match('/\pL/u', $char);
         });
         if (empty($alphabetChars)) {
             return $str;
         }
-        $pos = array_rand($alphabetChars);
+        $pos = array_keys($alphabetChars)[random_int(0, count($alphabetChars) - 1)];
         return substr_replace($str, '', $pos, 1);
     }
 
-    function addRandomChar(string $str): string
+    public function addRandomChar(string $str): string
     {
         $strArray = preg_split('//u', $str, -1, PREG_SPLIT_NO_EMPTY);
-        $alphabetChars = array_filter($strArray, function($char) {
+        $alphabetChars = array_filter($strArray, function ($char) {
             return preg_match('/\pL/u', $char);
         });
         if (empty($alphabetChars)) {
             return $str;
         }
-        $pos = rand(0, mb_strlen($str));
-        $char = $alphabetChars[array_rand($alphabetChars)];
+
+        $pos = random_int(0, mb_strlen($str));
+        $charKeys = array_keys($alphabetChars);
+        $char = $alphabetChars[$charKeys[random_int(0, count($charKeys) - 1)]];
         return mb_substr($str, 0, $pos) . $char . mb_substr($str, $pos);
     }
 
-    function swapRandomAdjacentChars(string $str): string
+    public function swapRandomAdjacentChars(string $str): string
     {
         $strArray = preg_split('//u', $str, -1, PREG_SPLIT_NO_EMPTY);
         if (count($strArray) < 2) {
             return $str;
         }
-        $pos = rand(0, count($strArray) - 2);
-        list($strArray[$pos], $strArray[$pos+1]) = array($strArray[$pos+1], $strArray[$pos]);
+        $pos = random_int(0, count($strArray) - 2);
+        list($strArray[$pos], $strArray[$pos + 1]) = array($strArray[$pos + 1], $strArray[$pos]);
         return implode('', $strArray);
     }
-
 }

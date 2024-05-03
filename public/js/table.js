@@ -29,7 +29,7 @@ $(document).ready(function() {
     }
 
     const slider = document.getElementById("errorSliderRange");
-    const input = document.getElementById("errorsСount");
+    const input = document.getElementById("errors");
     const button = document.getElementById('randomButton');
     const seedInput = document.getElementById('seedRange');
 
@@ -49,7 +49,7 @@ $(document).ready(function() {
 
     function sendData() {
         var region = $('#selectRegion').val();
-        var errors = $('#errorsСount').val();
+        var errors = $('#errors').val();
         var seed = $('#seedRange').val();
         $.ajax({
             url: '/index/getdata',
@@ -64,7 +64,7 @@ $(document).ready(function() {
     document.getElementById('randomButton').addEventListener('click', sendData);
     document.getElementById('selectRegion').addEventListener('change', sendData);
     document.getElementById('seedRange').addEventListener('change', sendData);
-    document.getElementById('errorsСount').addEventListener('change', sendData);
+    document.getElementById('errors').addEventListener('change', sendData);
     document.getElementById('errorSliderRange').addEventListener('change', sendData);
 
 });
