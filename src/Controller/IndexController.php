@@ -28,8 +28,8 @@ class IndexController extends AbstractController
         $region = $request->get('region');
         $seed = $request->get('seed');
         $errors = $request->get('errors');
-
-        $generatedData = $dataGenerator->generateData($region, $errors, $seed);
+        $page = $request->get('count');
+        $generatedData = $dataGenerator->generateData($region, $errors, $seed, $page);
       //  $generatedData = mb_convert_encoding($generatedData, 'UTF8', 'UTF-8');
         return new JsonResponse($generatedData);
     }

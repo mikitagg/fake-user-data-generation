@@ -24,26 +24,28 @@ class DataGenerator
         $this->faker = Factory::create();
     }
 
-    public function generateData(?string $region, float|int $errors, int|string|null $seed): array
+    public function generateData(?string $region, float|int $errors, int|string|null $seed, int $page): array
     {
         mt_srand($seed);
         $this->faker->seed($seed);
         $this->setRegion($region);
         $userData = [];
-
-        for ($i = 0; $i < 3; ++$i) {
-            $userData[] = $this->introduceErrors([
-                //        'id' => $i,
-                //        'uuid' =>  $faker->uuid(),
+        for ($i = 0; $i < $page; ++$i) {
+            $id = $i;
+            $uuid = $this->faker->uuid();
+            $data = [
                 'name' => $this->faker->name(),
                 'address' => $this->faker->address(),
                 'phoneNumber' => $this->faker->phoneNumber(),
-            ], $errors);
+            ];
+            $userData[] = [
+                'id' => $id,
+                'uuid' => $uuid,
+                'data' => $this->introduceErrors($data, $errors),
+            ];
         }
-
         return $userData;
     }
-
     public function setRegion(?string $region): void
     {
         switch ($region) {
@@ -93,15 +95,10 @@ class DataGenerator
 
     public function introduceErrors(array $array, int|float $errors): array
     {
-        //     $uuid= $array['uuid'];
-        //  $array['uuid'] = '';
         $string = implode(';', $array);
         $errorString = $this->createErrors($string, $errors);
         $newArray = explode(';', $errorString);
-        $newArray = array_combine(array_keys($array), $newArray);
-        //     $newArray['uuid'] = $uuid;
-
-        return $newArray;
+        return array_combine(array_keys($array), $newArray);
     }
 
     public function removeRandomChar(string $str): string

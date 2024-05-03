@@ -13,15 +13,15 @@ $(document).ready(function() {
             ff.appendChild(td);
 
             td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.name));
+            td.appendChild(document.createTextNode(data.data.name));
             ff.appendChild(td);
 
             td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.address));
+            td.appendChild(document.createTextNode(data.data.address));
             ff.appendChild(td);
 
             td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.phoneNumber));
+            td.appendChild(document.createTextNode(data.data.phoneNumber));
             ff.appendChild(td);
 
             f.appendChild(ff);
@@ -42,21 +42,33 @@ $(document).ready(function() {
     });
 
     button.addEventListener("click", () => {
-        seedInput.value = Math.floor(Math.random() * 10000000);
+        seedInput.value = Math.floor((Math.random() * 1000000) + 1);
 
     })
 
+    var count = 20;
+    var isLoading = false;
+
+    window.onscroll = function() {
+        if (!isLoading && (window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            sendData();
+            count += 10;
+        }
+    };
+
 
     function sendData() {
+        isLoading = true;
         var region = $('#selectRegion').val();
         var errors = $('#errors').val();
         var seed = $('#seedRange').val();
         $.ajax({
             url: '/index/getdata',
             type: 'GET',
-            data: { region : region, seed : seed, errors : errors },
+            data: { region : region, seed : seed, errors : errors, count:count },
             success: function(response) {
-                renderTable(response)
+                renderTable(response);
+                isLoading = false;
             }
         });
     }
