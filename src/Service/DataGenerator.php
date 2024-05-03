@@ -19,9 +19,11 @@ class DataGenerator
 {
     protected \Faker\Generator $faker;
 
-    public function __construct()
+    protected PhoneNumberGenerator $generator;
+    public function __construct(PhoneNumberGenerator $generator)
     {
         $this->faker = Factory::create();
+        $this->generator = $generator;
     }
 
     public function generateData(?string $region, float|int $errors, int|string|null $seed, int $page): array
@@ -36,7 +38,7 @@ class DataGenerator
             $data = [
                 'name' => $this->faker->name(),
                 'address' => $this->faker->address(),
-                'phoneNumber' => $this->faker->phoneNumber(),
+                'phoneNumber' => $this->generator->countryPhoneNumber($region),
             ];
             $userData[] = [
                 'id' => $id,
