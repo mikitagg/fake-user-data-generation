@@ -38,7 +38,7 @@ class DataGenerator
             $data = [
                 'name' => $this->faker->name(),
                 'address' => $this->faker->address(),
-                'phoneNumber' => $this->generator->countryPhoneNumber($region),
+                'phoneNumber' => $this->faker->numerify($this->generator->countryPhoneNumber($region, $seed)),
             ];
             $userData[] = [
                 'id' => $id,

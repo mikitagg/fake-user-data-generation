@@ -12,18 +12,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class IndexController extends AbstractController
 {
-//    #[Route('/', name: 'app_homepage')]
-//    public function home(Request $request, DataGenerator $dataGenerator): Response
-//    {
-//
-//    }
     #[Route('/index', name: 'app_index')]
     public function index(Request $request, DataGenerator $dataGenerator): Response
     {
 
         return $this->render('index/index.html.twig', [
-            'controller_name' => 'IndexController',
-           // 'generatedData' => $generatedData,
+            'controller_name' => 'IndexController'
         ]);
     }
 
@@ -35,7 +29,6 @@ class IndexController extends AbstractController
         $errors = $request->get('errors');
         $page = $request->get('count');
         $generatedData = $dataGenerator->generateData($region, $errors, $seed, $page);
-      //  $generatedData = mb_convert_encoding($generatedData, 'UTF8', 'UTF-8');
         return new JsonResponse($generatedData);
     }
 }
