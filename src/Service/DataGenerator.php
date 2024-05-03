@@ -4,26 +4,26 @@ namespace App\Service;
 
 use Faker\Provider\fr_FR\Address as frAddress;
 use Faker\Provider\fr_FR\Person as frPerson;
-use Faker\Provider\fr_FR\PhoneNumber as frPhoneNumber;
 use Faker\Provider\ru_RU\Address as ruAddress;
 use Faker\Provider\ru_RU\Person as ruPerson;
-use Faker\Provider\ru_RU\PhoneNumber as ruPhoneNumber;
 use Faker\Provider\en_US\Address as enAddress;
 use Faker\Provider\en_US\Person as enPerson;
-use Faker\Provider\en_US\PhoneNumber as enPhoneNumber;
 use Faker\Factory;
-
-
+use \Faker\Generator;
 
 class DataGenerator
 {
-    protected \Faker\Generator $faker;
+    protected Generator $faker;
 
     protected PhoneNumberGenerator $generator;
-    public function __construct(PhoneNumberGenerator $generator)
+
+    protected AddressGenerator $addressGenerator;
+
+    public function __construct(PhoneNumberGenerator $generator, AddressGenerator $addressGenerator)
     {
         $this->faker = Factory::create();
         $this->generator = $generator;
+        $this->addressGenerator = $addressGenerator;
     }
 
     public function generateData(?string $region, float|int $errors, int|string|null $seed, int $count): array
@@ -33,38 +33,34 @@ class DataGenerator
         $this->setRegion($region);
         $userData = [];
         for ($i = 0; $i < $count; ++$i) {
-            $id = $i;
             $uuid = $this->faker->uuid();
             $data = [
                 'name' => $this->faker->name(),
-                'address' => $this->faker->address(),
+                'address' => $this->generateAddress($i, $region),
                 'phoneNumber' => $this->faker->numerify($this->generator->countryPhoneNumber($region)),
             ];
             $userData[] = [
-                'id' => $id,
                 'uuid' => $uuid,
                 'data' => $this->introduceErrors($data, $errors),
             ];
         }
         return $userData;
     }
+
     public function setRegion(?string $region): void
     {
         switch ($region) {
             case 'FR':
                 $this->faker->addProvider(new frPerson($this->faker));
                 $this->faker->addProvider(new frAddress($this->faker));
-                $this->faker->addProvider(new frPhoneNumber($this->faker));
                 break;
             case 'RU':
                 $this->faker->addProvider(new ruPerson($this->faker));
                 $this->faker->addProvider(new ruAddress($this->faker));
-                $this->faker->addProvider(new ruPhoneNumber($this->faker));
                 break;
             case 'EN':
                 $this->faker->addProvider(new enPerson($this->faker));
                 $this->faker->addProvider(new enAddress($this->faker));
-                $this->faker->addProvider(new enPhoneNumber($this->faker));
                 break;
         }
     }
@@ -162,5 +158,20 @@ class DataGenerator
             $error = ceil($error);
         }
         return $error;
+    }
+
+    public function generateAddress(int $i, $region): array|string
+    {
+        return str_replace(
+            $this->addressGenerator->addressVariable,
+            [
+                $this->faker->buildingNumber(),
+                str_replace(' Street', '', $this->faker->streetName()),
+                $this->faker->city(),
+                $this->faker->lexify($this->faker->numerify($this->addressGenerator->setPostCode($region))),
+                $this->addressGenerator->setAddress($region)
+            ],
+            $this->addressGenerator->formats[$i % count($this->addressGenerator->formats)]
+        );
     }
 }
