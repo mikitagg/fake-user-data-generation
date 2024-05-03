@@ -24,7 +24,7 @@ class DataGenerator
         $this->faker = Factory::create();
     }
 
-    public function generateData(?string $region, int|float $errors, int|string|null $seed): array
+    public function generateData(?string $region, float|int $errors, int|string|null $seed): array
     {
         mt_srand($seed);
         $this->faker->seed($seed);
@@ -32,7 +32,6 @@ class DataGenerator
         $userData = [];
 
         for ($i = 0; $i < 3; ++$i) {
-
             $userData[] = $this->introduceErrors([
                 //        'id' => $i,
                 //        'uuid' =>  $faker->uuid(),
@@ -66,19 +65,17 @@ class DataGenerator
         }
     }
 
-    public function createErrors(string $str, int|float $countErrors): string
+    public function createErrors(string $str, float|int $countErrors): string
     {
+
+        if(is_float($countErrors)) {
+            $countErrors = $this->possibilityOfError($countErrors);
+        }
         if (!$countErrors) {
             return $str;
         }
-//        if(is_float($countErrors)) {
-//            $countErrors = $this->possibilityOfError($countErrors);
-//        }
-
-
         for ($i = 0; $i < $countErrors; ++$i) {
             $errorType = random_int(1, 3);
-
             switch ($errorType) {
                 case 1:
                     $str = $this->removeRandomChar($str);
@@ -94,7 +91,7 @@ class DataGenerator
         return $str;
     }
 
-    public function introduceErrors(array $array, ?int $errors): array
+    public function introduceErrors(array $array, int|float $errors): array
     {
         //     $uuid= $array['uuid'];
         //  $array['uuid'] = '';
@@ -109,41 +106,62 @@ class DataGenerator
 
     public function removeRandomChar(string $str): string
     {
-        $strArray = str_split($str);
-        $alphabetChars = array_filter($strArray, function ($char) {
-            return preg_match('/\pL/u', $char);
-        });
+        $strArray = mb_str_split($str);
+        $alphabetChars = [];
+        foreach ($strArray as $key => $char) {
+            if (preg_match('/\pL/u', $char)) {
+                $alphabetChars[$key] = $char;
+            }
+        }
         if (empty($alphabetChars)) {
             return $str;
         }
-        $pos = array_keys($alphabetChars)[random_int(0, count($alphabetChars) - 1)];
-        return substr_replace($str, '', $pos, 1);
+        $keys = array_keys($alphabetChars);
+        $pos = $keys[random_int(0, count($keys) - 1)];
+        return mb_substr($str, 0, $pos) . mb_substr($str, $pos + 1);
     }
 
     public function addRandomChar(string $str): string
     {
-        $strArray = preg_split('//u', $str, -1, PREG_SPLIT_NO_EMPTY);
-        $alphabetChars = array_filter($strArray, function ($char) {
-            return preg_match('/\pL/u', $char);
-        });
+        $strArray = mb_str_split($str);
+        $alphabetChars = [];
+        foreach ($strArray as $key => $char) {
+            if (preg_match('/\pL/u', $char)) {
+                $alphabetChars[$key] = $char;
+            }
+        }
         if (empty($alphabetChars)) {
             return $str;
         }
-
         $pos = random_int(0, mb_strlen($str));
         $charKeys = array_keys($alphabetChars);
         $char = $alphabetChars[$charKeys[random_int(0, count($charKeys) - 1)]];
         return mb_substr($str, 0, $pos) . $char . mb_substr($str, $pos);
+
     }
 
     public function swapRandomAdjacentChars(string $str): string
     {
-        $strArray = preg_split('//u', $str, -1, PREG_SPLIT_NO_EMPTY);
+        $strArray = mb_str_split($str);
         if (count($strArray) < 2) {
             return $str;
         }
         $pos = random_int(0, count($strArray) - 2);
-        list($strArray[$pos], $strArray[$pos + 1]) = array($strArray[$pos + 1], $strArray[$pos]);
+        $temp = $strArray[$pos];
+        $strArray[$pos] = $strArray[$pos + 1];
+        $strArray[$pos + 1] = $temp;
         return implode('', $strArray);
+    }
+
+    public function possibilityOfError($error): int
+    {
+        $chance = random_int(1, 2);
+        if ($chance === 1) {
+            $error =  floor($error);
+        }
+        if ($chance === 2) {
+            $error = ceil($error);
+        }
+        return $error;
     }
 }

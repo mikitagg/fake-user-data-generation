@@ -30,6 +30,7 @@ class IndexController extends AbstractController
         $errors = $request->get('errors');
 
         $generatedData = $dataGenerator->generateData($region, $errors, $seed);
+      //  $generatedData = mb_convert_encoding($generatedData, 'UTF8', 'UTF-8');
         return new JsonResponse($generatedData);
     }
 }
