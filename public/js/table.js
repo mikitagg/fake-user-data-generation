@@ -1,10 +1,7 @@
-
-
 $(document).ready(function() {
     function renderTable(data) {
         var f = document.getElementById('tbody');
         var id = f.getElementsByTagName('tr').length + 1;
-      //  f.innerHTML = '';
         data.forEach(function (data) {
             var ff = document.createElement('tr');
             var td = document.createElement('td');
@@ -58,8 +55,6 @@ $(document).ready(function() {
             page += 1;
             count = 10;
             sendData();
-
-
         }
     };
 
@@ -105,7 +100,6 @@ $(document).ready(function() {
         resetTable();
         sendData();
     });
-
 });
 
 
