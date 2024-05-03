@@ -26,19 +26,19 @@ class DataGenerator
         $this->generator = $generator;
     }
 
-    public function generateData(?string $region, float|int $errors, int|string|null $seed, int $page): array
+    public function generateData(?string $region, float|int $errors, int|string|null $seed, int $count): array
     {
         mt_srand($seed);
         $this->faker->seed($seed);
         $this->setRegion($region);
         $userData = [];
-        for ($i = 0; $i < $page; ++$i) {
+        for ($i = 0; $i < $count; ++$i) {
             $id = $i;
             $uuid = $this->faker->uuid();
             $data = [
                 'name' => $this->faker->name(),
                 'address' => $this->faker->address(),
-                'phoneNumber' => $this->faker->numerify($this->generator->countryPhoneNumber($region, $seed)),
+                'phoneNumber' => $this->faker->numerify($this->generator->countryPhoneNumber($region)),
             ];
             $userData[] = [
                 'id' => $id,

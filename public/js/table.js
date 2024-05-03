@@ -1,11 +1,14 @@
+
+
 $(document).ready(function() {
     function renderTable(data) {
         var f = document.getElementById('tbody');
-        f.innerHTML = '';
+        var id = f.getElementsByTagName('tr').length + 1;
+      //  f.innerHTML = '';
         data.forEach(function (data) {
             var ff = document.createElement('tr');
             var td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.id));
+            td.appendChild(document.createTextNode(id++));
             ff.appendChild(td);
 
             td = document.createElement('td');
@@ -47,25 +50,34 @@ $(document).ready(function() {
     })
 
     var count = 20;
+    var page = 1;
     var isLoading = false;
 
     window.onscroll = function() {
         if (!isLoading && (window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            page += 1;
+            count = 10;
             sendData();
-            count += 10;
+
+
         }
     };
 
+    function resetTable() {
+        document.getElementById('tbody').innerHTML = '';
+        page = 0;
+        count = 20;
+    }
 
     function sendData() {
         isLoading = true;
         var region = $('#selectRegion').val();
         var errors = $('#errors').val();
-        var seed = $('#seedRange').val();
+        var seed = parseInt($('#seedRange').val()) + page;
         $.ajax({
             url: '/index/getdata',
             type: 'GET',
-            data: { region : region, seed : seed, errors : errors, count:count },
+            data: { region : region, seed : seed, errors : errors, count:count, page:page },
             success: function(response) {
                 renderTable(response);
                 isLoading = false;
@@ -73,11 +85,27 @@ $(document).ready(function() {
         });
     }
 
-    document.getElementById('randomButton').addEventListener('click', sendData);
-    document.getElementById('selectRegion').addEventListener('change', sendData);
-    document.getElementById('seedRange').addEventListener('change', sendData);
-    document.getElementById('errors').addEventListener('change', sendData);
-    document.getElementById('errorSliderRange').addEventListener('change', sendData);
+    document.getElementById('randomButton').addEventListener('click', function() {
+        resetTable();
+        sendData();
+    });
+    document.getElementById('selectRegion').addEventListener('change', function() {
+        resetTable();
+        sendData();
+    });
+    document.getElementById('seedRange').addEventListener('change', function() {
+        resetTable();
+        sendData();
+    });
+    document.getElementById('errors').addEventListener('change', function() {
+        resetTable();
+        sendData();
+    });
+    document.getElementById('errorSliderRange').addEventListener('change', function() {
+        resetTable();
+        sendData();
+    });
 
 });
+
 

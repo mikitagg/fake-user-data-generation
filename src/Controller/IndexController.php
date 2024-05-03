@@ -27,8 +27,8 @@ class IndexController extends AbstractController
         $region = $request->get('region');
         $seed = $request->get('seed');
         $errors = $request->get('errors');
-        $page = $request->get('count');
-        $generatedData = $dataGenerator->generateData($region, $errors, $seed, $page);
+        $count = $request->get('count');
+        $generatedData = $dataGenerator->generateData($region, $errors, $seed, $count);
         return new JsonResponse($generatedData);
     }
 }
