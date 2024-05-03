@@ -12,6 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class IndexController extends AbstractController
 {
+//    #[Route('/', name: 'app_homepage')]
+//    public function home(Request $request, DataGenerator $dataGenerator): Response
+//    {
+//
+//    }
     #[Route('/index', name: 'app_index')]
     public function index(Request $request, DataGenerator $dataGenerator): Response
     {
