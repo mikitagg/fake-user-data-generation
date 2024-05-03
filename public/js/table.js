@@ -1,4 +1,12 @@
 $(document).ready(function() {
+    var count = 20;
+    var page = 1;
+    var isLoading = false;
+    const slider = document.getElementById("errorSliderRange");
+    const input = document.getElementById("errors");
+    const button = document.getElementById('randomButton');
+    const seedInput = document.getElementById('seedRange');
+    sendData();
     function renderTable(data) {
         var f = document.getElementById('tbody');
         var id = f.getElementsByTagName('tr').length + 1;
@@ -28,11 +36,6 @@ $(document).ready(function() {
         })
     }
 
-    const slider = document.getElementById("errorSliderRange");
-    const input = document.getElementById("errors");
-    const button = document.getElementById('randomButton');
-    const seedInput = document.getElementById('seedRange');
-
     slider.addEventListener("input", () => {
         input.value = slider.value ;
     });
@@ -45,10 +48,6 @@ $(document).ready(function() {
         seedInput.value = Math.floor((Math.random() * 1000000) + 1);
 
     })
-
-    var count = 20;
-    var page = 1;
-    var isLoading = false;
 
     window.onscroll = function() {
         if (!isLoading && (window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
